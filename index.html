@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calculator</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> 
+</head>
+<body>
+    Calculator
+    <form id="sampleForm">
+        <input type="number" id="firstNumber" name="firstNumber">
+        <select id="operator" name="operator">
+        </select>
+        <input type="number" id="secondNumber" name="secondNumber">
+        <input type="submit" value="Count">
+    </form>
+    <br>
+    <div id="resultDiv"></div>
+    <script>
+        $(document).ready(function() {
+          $.ajax({
+                url: 'http://127.0.0.1:8000/calculator/operators', // load from config for SPA
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    console.log(data)
+                      $.each(data.operators, function(index, value) {
+                        $('#operator')
+                        .append(
+                            $("<option></option>")
+                            .attr("value", value)
+                            .text(value)
+                        )
+                    })
+                },
+        })
+        })
+
+        $(document).ready(function() {
+        $('#sampleForm').on('submit', function(e) {
+            e.preventDefault();
+            var firstNumber = $('#firstNumber').val();
+            var selectedOption = $('#operator').val();
+            var secondNumber = $('#secondNumber').val();
+            var dataToSend = {
+                firstNumber: firstNumber,
+                operator: selectedOption,
+                secondNumber: secondNumber
+            };
+            $.ajax({
+                url: 'http://127.0.0.1:8000/calculator/calculate',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(dataToSend),
+                success: function(result) {
+                    $('#resultDiv').text('Result: ' + result.result);
+                },
+            });
+        });
+    });
+    </script>
+</body>
+</html> 
